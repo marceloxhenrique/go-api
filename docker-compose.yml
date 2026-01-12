@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: goproducts
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: goproducts
+    ports:
+      - "5433:5432"
