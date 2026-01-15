@@ -1,0 +1,12 @@
+{
+  "go.experiments": {
+    "testExplorer": true
+  },
+  "gopls": {},
+  "editor.fontLigatures": false,
+
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "golang.go"
+  }
+}
