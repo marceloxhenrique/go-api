@@ -16,10 +16,29 @@ func NewProductUsecase(repo repository.ProductRepository) ProductUsecase {
 }
 
 func (p *ProductUsecase) GetAllProducts() ([]model.Product, error) {
-	// return []model.Product{}, nil
 	products, err := p.repository.GetProducts()
 	if err != nil {
 		return nil, err
 	}
 	return products, nil
+}
+
+func (p *ProductUsecase) AddProduct(product model.Product) (model.Product, error) {
+	productId, err := p.repository.AddProduct(product)
+
+	if err != nil {
+		return model.Product{}, err
+	}
+	product.ID = productId
+	return product, nil
+}
+
+func (p *ProductUsecase) GetProductById(productId int) (model.Product, error) {
+	product, err := p.repository.GetProductById(productId)
+
+	if err != nil {
+		return model.Product{}, err
+	}
+
+	return product, nil
 }

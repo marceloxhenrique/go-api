@@ -18,9 +18,7 @@ func main() {
 	}
 
 	ProductRepository := repository.NewProductRepository(dbConnection)
-
 	ProductUsecase := usecase.NewProductUsecase(ProductRepository)
-
 	ProductController := controller.NewProductController(ProductUsecase)
 
 	server.GET("/ping", func(ctx *gin.Context) {
@@ -30,7 +28,7 @@ func main() {
 	})
 
 	server.GET("/products", ProductController.GetProducts)
-
+	server.GET("/products/:id", ProductController.GetProductById)
+	server.POST("/products", ProductController.AddProduct)
 	server.Run(":8080")
-
 }
