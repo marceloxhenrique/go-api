@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"go-products/model"
 	"go-products/usecase"
 	"net/http"
@@ -32,23 +33,6 @@ func (p *productController) GetProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (p *productController) GetProductById(ctx *gin.Context) {
-	productId := ctx.Param("id")
-	id, err := strconv.Atoi(productId)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
-		return
-	}
-
-	product, err := p.productUsecase.GetProductById(id)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	ctx.JSON(http.StatusOK, product)
-}
-
 func (p *productController) AddProduct(ctx *gin.Context) {
 
 	var product model.Product
@@ -66,4 +50,45 @@ func (p *productController) AddProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, insertedProduct)
+}
+
+func (p *productController) GetProductById(ctx *gin.Context) {
+	productId := ctx.Param("id")
+	id, err := strconv.Atoi(productId)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	product, err := p.productUsecase.GetProductById(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, product)
+}
+
+func (p *productController) DeleteProductById(ctx *gin.Context) {
+
+	id, err := strconv.Atoi(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": "Invalid Id"})
+		return
+	}
+
+	err = p.productUsecase.DeleteProductById(id)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"Error": "product not found"})
+			return
+		}
+
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }

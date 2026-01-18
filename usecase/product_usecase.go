@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"database/sql"
 	"go-products/model"
 	"go-products/repository"
 )
@@ -41,4 +42,16 @@ func (p *ProductUsecase) GetProductById(productId int) (model.Product, error) {
 	}
 
 	return product, nil
+}
+
+func (p *ProductUsecase) DeleteProductById(productId int) error {
+	rows, err := p.repository.DeleteProductById(productId)
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return sql.ErrNoRows
+	}
+	return nil
 }
