@@ -69,8 +69,7 @@ func (pr *ProductRepository) GetProductById(productId int) (model.Product, error
 	err := pr.connection.QueryRow(query, productId).Scan(
 		&product.ID, &product.Name, &product.Price,
 	)
-	fmt.Println("ERROR", err == sql.ErrNoRows)
-	fmt.Println("ERROR2")
+
 	if err != nil {
 		fmt.Println(err)
 		return model.Product{}, err

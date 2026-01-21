@@ -57,13 +57,20 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 	id, err := strconv.Atoi(productId)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": "Invalid product ID",
+		})
 		return
 	}
 
 	product, err := p.productUsecase.GetProductById(id)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"Error": "Product not found"})
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"Error": "Internal server error",
+		})
 		return
 	}
 	ctx.JSON(http.StatusOK, product)
