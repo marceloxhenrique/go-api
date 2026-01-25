@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"go-products/model"
 	"go-products/usecase"
 	"net/http"
@@ -65,12 +64,12 @@ func (p *productController) GetProductById(ctx *gin.Context) {
 
 	product, err := p.productUsecase.GetProductById(id)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, gin.H{"Error": "Product not found"})
-		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"Error": "Internal server error",
-		})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Internal server error"})
+		return
+	}
+
+	if product == nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"Error": "Product not found"})
 		return
 	}
 	ctx.JSON(http.StatusOK, product)
@@ -85,15 +84,15 @@ func (p *productController) DeleteProductById(ctx *gin.Context) {
 		return
 	}
 
-	err = p.productUsecase.DeleteProductById(id)
+	row, err := p.productUsecase.DeleteProductById(id)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, gin.H{"Error": "product not found"})
-			return
-		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": "Internal server error"})
+		return
+	}
 
-		ctx.JSON(http.StatusInternalServerError, gin.H{"Error": err.Error()})
+	if row == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{"Error": "product not found"})
 		return
 	}
 

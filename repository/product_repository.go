@@ -24,6 +24,7 @@ func (pr *ProductRepository) GetProducts() ([]model.Product, error) {
 		return []model.Product{}, err
 
 	}
+	defer rows.Close()
 	var productList []model.Product
 	var productObj model.Product
 
@@ -61,7 +62,7 @@ func (pr *ProductRepository) AddProduct(product model.Product) (int, error) {
 	return id, nil
 }
 
-func (pr *ProductRepository) GetProductById(productId int) (model.Product, error) {
+func (pr *ProductRepository) GetProductById(productId int) (*model.Product, error) {
 
 	query := "SELECT id, product_name, price FROM product WHERE id = $1"
 
@@ -69,12 +70,16 @@ func (pr *ProductRepository) GetProductById(productId int) (model.Product, error
 	err := pr.connection.QueryRow(query, productId).Scan(
 		&product.ID, &product.Name, &product.Price,
 	)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 
 	if err != nil {
 		fmt.Println(err)
-		return model.Product{}, err
+		return nil, err
 	}
-	return product, nil
+
+	return &product, nil
 }
 
 func (pr *ProductRepository) DeleteProductById(productId int) (int64, error) {
